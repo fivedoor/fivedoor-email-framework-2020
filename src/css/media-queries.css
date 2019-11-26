@@ -85,6 +85,18 @@
     .width-100percent {
         width: 100% !important;
     }
+    /**  2 Column Stack - apply 100% width to L&R cols to stack */
+    .mod-2col-stack .col-l,
+    .mod-2col-stack .col-r {
+        width: 100% !important;
+    }
+    /**  3 Column Stack - apply 100% width to 3 cols to stack */
+    .mod-3col .col-1,
+    .mod-3col .col-2,
+    .mod-3col .col-3
+    .mod-3col .gutter {
+         width: 100% !important;
+    }
     /** BG overlap collapse - to view more of bg image on mobile*/
     #bg-overlap {
         padding-top: 0 !important;

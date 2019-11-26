@@ -33,10 +33,18 @@
   }
 
   /** BG-2COL STACK -------------------------------------------------------------------------  */
+   /**  Update width to work with mso/ie conditional code */
   .ie-target #width-330,
   .mso-target #width-330
   {
     width: 330px !important;
+  }
+  /** BG-2COL FLUID -------------------------------------------------------------------------  */
+   /**  Update width to work with mso/ie conditional code */
+  .ie-target .mod-2col-fluid .col-r,
+  .mso-target .mod-2col-fluid .col-r
+  {
+    width: 100% !important;
   }
 
   /**  BG-3COL -------------------------------------------------------------------------  */
