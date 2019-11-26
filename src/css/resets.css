@@ -6,12 +6,12 @@
 .ReadMsgBody {
     width: 100%;
 
-    background-color: #fff;
+    background-color: #ffffff;
 }
 .ExternalClass {
     width: 100%;
 
-    background-color: #fff;
+    background-color: #ffffff;
 }
 .ExternalClass p,
 .ExternalClass span,
@@ -25,7 +25,7 @@ body {
     padding: 0;
     margin: 0;
 
-    background-color: #fff;
+    background-color: #ffffff;
 }
 body,
 table,
