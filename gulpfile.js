@@ -29,6 +29,10 @@ var cache = require('gulp-cache');
 // CSS 
 // Inline css
 var inlineCss = require('gulp-inline-css');
+var inline = require('gulp-inline');
+
+// REPLACE 
+var replace = require('gulp-replace');
 
 // DATA
 // A gulp plugin for deep-merging multiple JSON files into one file. Use with image-size-export
@@ -152,9 +156,12 @@ function requireUncached( $module ) {
 
 /*
 |--------------------------------------------------------------------------
-| GULP TASKS
+| GULP SEQUENCES
 |--------------------------------------------------------------------------
+  NB: I belive need to 'return' gulp in each task in order for sequencing to work
+  data task does not contain return so may need to check on that 
 */
+
 
 // BUILD CHAIN
 // --------------------------------------------------
@@ -179,9 +186,14 @@ gulp.task('template', function(callback) {
 // CSS CHAIN
 // --------------------------------------------------
 gulp.task('css', function(callback) {
-  runSequence('css:inline','css:inject', 'watch', callback);
+  runSequence(
+      'css:compile','css:ignore','css:inline','css:inject', 'watch', callback);
 });
 
+gulp.task('foo', function(callback) {
+  runSequence(
+      ['css:ignore'],['css:inline'], callback);
+});
 
 //  CLEAR CHAIN
 // --------------------------------------------------
@@ -335,40 +347,67 @@ gulp.task('links:inject', function() {
 });
 
 
-// INLINE CSS
+
+
+// SAVE STYLES TO COMPILE FOLDER
+// --------------------------------------------------------------------------------------------------
+gulp.task('css:compile', function() {
+    return gulp
+        .src('src/css/**/*.+(html|css)')
+        .pipe(gulp.dest('src/compiled/css/'))
+        .pipe(notify({ message: 'css:compile task complete' }));
+});
+
+
+// REMOVE BLOCKS NOT TO BE INLINED
+// --------------------------------------------------
+
+gulp.task('css:ignore', function(){
+      return gulp
+        .src(['src/index.html'])
+        .pipe(replace('<link rel="stylesheet" href="css/resets.css">', ''))
+        .pipe(replace('<link rel="stylesheet" href="css/style.css">', ''))
+        .pipe(replace('<link rel="stylesheet" href="css/media-queries.css">', ''))
+       .pipe(gulp.dest('src/compiled/'));
+});
+
+// INLINE CSS  !!!!!!!!!! doese not work after css:ignore is run in sequence 
 // --------------------------------------------------
 gulp.task('css:inline', function() {
     return gulp
-        .src('src/index.html')
+        .src('src/compiled/index.html')
         .pipe(inlineCss({
             applyStyleTags: true,
             applyLinkTags: true,
             removeStyleTags: true,
             removeLinkTags: true
         }))
-        .pipe(gulp.dest('src'));
+        .pipe(gulp.dest('src/compiled/'));
 });
 
 
+
 // INJECT CSS RESETS & MEDIA QUERIES & OUTLOOK BODY TAGS 
+// injects the 'ignored' css to style block 
 // OL body tag cause gulp watch to break so injecting them at the end
 // --------------------------------------------------
 gulp.task('css:inject', function() {
   // Gets .html and .nunjucks files in css
   return gulp
-    .src('src/css/njk/**/*.+(html|njk)')
-    .pipe(rename("index.html"))
+    .src('src/compiled/css/njk/**/*.+(html|njk)')
+     .pipe(rename("index.html"))
     // Adding data to Nunjucks
     .pipe(data(function() {
       return require('./src/data/data.json')
     }))
     // Renders template with nunjucks
     .pipe(nunjucksRender({
-      path: ['src/']
+      path: ['src/compiled/']
     }))
+    .pipe(rename("index.html"))
     // output files in app folder
-    .pipe(gulp.dest('src'))
-    .pipe(bs.stream());
+    .pipe(gulp.dest('src/compiled/'))
+    // .pipe(bs.stream());
 });
 
 
@@ -378,10 +417,8 @@ gulp.task('css:inject', function() {
 // --------------------------------------------------
 gulp.task('html:tidy', function() {
     return gulp
-    .src(['./src/index.html'])
+    .src(['./src/compiled/index.html'])
     .pipe(prettify())
-    .pipe(gulp.dest('./src/'))
-    .pipe(rename('email.html'))
     .pipe(gulp.dest('./dist/'));
 });
 
@@ -391,7 +428,7 @@ gulp.task('html:tidy', function() {
 // https://github.com/kangax/html-minifier
 gulp.task('html:min', function() {
   return gulp
-    .src('src/index.html')
+    .src('dist/email.html')
     .pipe(htmlmin({
       collapseWhitespace: true,
       minifyCSS: true,
