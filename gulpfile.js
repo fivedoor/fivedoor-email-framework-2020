@@ -80,7 +80,9 @@ var livereload = require('gulp-livereload');
 var watch = require('gulp-watch');
 
 // So we can run tasks in sequence as Gulp otherwise activates tasks simultaneously.
-var runSequence = require('run-sequence');
+// var runSequence = require('run-sequence');
+const runSequence = require('gulp4-run-sequence');
+
 
 // Clear Files
 var del = require('del');
@@ -154,64 +156,6 @@ function requireUncached( $module ) {
 }
 
 
-/*
-|--------------------------------------------------------------------------
-| GULP SEQUENCES
-|--------------------------------------------------------------------------
-  NB: I belive need to 'return' gulp in each task in order for sequencing to work
-  data task does not contain return so may need to check on that 
-*/
-
-
-// BUILD CHAIN
-// --------------------------------------------------
-// Using runSequence plugin, rather than chaining them with Gulp, so tasks don't need to have dependency on other tasks when run by themselves
-gulp.task('build', function(callback) {
-  runSequence('folders:clean', 'data', 'sass', 'template', callback);
-});
-
-// REBUILD CHAIN
-// --------------------------------------------------
-gulp.task('rebuild', function(callback) {
-  runSequence('data', 'sass', 'template:comp', 'links:inject', 'css:inline','css:inject', 'html:tidy', 'html:min', callback);
-});
-
-
-// TEMPLATE CHAIN
-// --------------------------------------------------
-gulp.task('template', function(callback) {
-  runSequence('template:comp', 'links:inject', 'css:inline','css:inject', 'html:tidy', 'html:min', 'watch', callback);
-});
-
-// CSS CHAIN
-// --------------------------------------------------
-gulp.task('css', function(callback) {
-  runSequence(
-      'css:compile','css:ignore','css:inline','css:inject', 'watch', callback);
-});
-
-gulp.task('foo', function(callback) {
-  runSequence(
-      ['css:ignore'],['css:inline'], callback);
-});
-
-//  CLEAR CHAIN
-// --------------------------------------------------
-// gulp.task('data', ['img:data','img:host','copy:encode','data:comp']);
-gulp.task('clear', function(callback) {
-  runSequence('folders:clean','data_src:clean', callback);
-});
-
-
-
-// DATA CHAIN BASIC
-// --------------------------------------------------
-// gulp.task('data', ['img:data','img:host','copy:encode','data:comp']);
-gulp.task('data', function(callback) {
-  runSequence('data:comp', callback);
-});
-
-
 
 
 // INITIATE SERVER 
@@ -243,7 +187,7 @@ gulp.task('browserSync', function() {
 
 // WATCH  
 // --------------------------------------------------
-gulp.task('watch',['browserSync'], function(){
+gulp.task('watch', gulp.series('browserSync'), function(){
      // when sass files are edited sass task will rerun and browser will reload automatically
     //  gulp.watch(path.sass_watch, ['rebuild']);
      // when page index is edited template task will rerun and browser will reload automatically
@@ -348,21 +292,20 @@ gulp.task('links:inject', function() {
 
 
 
-
 // SAVE STYLES TO COMPILE FOLDER
 // --------------------------------------------------------------------------------------------------
-gulp.task('css:compile', function() {
+gulp.task('css:save-copy', function() {
     return gulp
         .src('src/css/**/*.+(html|css)')
         .pipe(gulp.dest('src/compiled/css/'))
-        .pipe(notify({ message: 'css:compile task complete' }));
+        .pipe(notify({ message: 'css:save-copy task complete' }));
 });
 
 
 // REMOVE BLOCKS NOT TO BE INLINED
 // --------------------------------------------------
 
-gulp.task('css:ignore', function(){
+gulp.task('css:inline-ignore', function(){
       return gulp
         .src(['src/index.html'])
         .pipe(replace('<link rel="stylesheet" href="css/resets.css">', ''))
@@ -371,7 +314,7 @@ gulp.task('css:ignore', function(){
        .pipe(gulp.dest('src/compiled/'));
 });
 
-// INLINE CSS  !!!!!!!!!! doese not work after css:ignore is run in sequence 
+// INLINE CSS  !!!!!!!!!! doese not work after css:inline-ignore is run in sequence 
 // --------------------------------------------------
 gulp.task('css:inline', function() {
     return gulp
@@ -384,7 +327,6 @@ gulp.task('css:inline', function() {
         }))
         .pipe(gulp.dest('src/compiled/'));
 });
-
 
 
 // INJECT CSS RESETS & MEDIA QUERIES & OUTLOOK BODY TAGS 
@@ -409,7 +351,6 @@ gulp.task('css:inject', function() {
     .pipe(gulp.dest('src/compiled/'))
     // .pipe(bs.stream());
 });
-
 
 
 
@@ -449,4 +390,72 @@ return cache.clearAll(callback)
 });
 
 
+
+/*
+|--------------------------------------------------------------------------
+| GULP SEQUENCES
+|--------------------------------------------------------------------------
+  NB: I belive need to 'return' gulp in each task in order for sequencing to work
+  data task does not contain return so may need to check on that 
+  NB:  a change introduced in Gulp 4. means a task cannot be defined before its dependencies hence these are at end of file
+*/
+
+
+// CSS COMPILE CHAIN
+// --------------------------------------------------
+gulp.task('compile', function (callback) {
+  runSequence(
+    'css:save-copy', 
+    'css:inline-ignore',
+    'css:inline',
+    'css:inject', 
+    'watch',
+    callback
+//  ^^^^^^^^
+//  This informs that the sequence is complete.
+  );
+});
+
+function doneFoo() {
+   console.log('compile completed')
+   return gulp
+        .pipe(notify({ message: 'compile completed' }));      
+}
+
+
+// BUILD CHAIN
+// --------------------------------------------------
+// Using runSequence plugin, rather than chaining them with Gulp, so tasks don't need to have dependency on other tasks when run by themselves
+gulp.task('build', function(callback) {
+  runSequence('folders:clean', 'data', 'sass', 'template', callback);
+});
+
+// REBUILD CHAIN
+// --------------------------------------------------
+gulp.task('rebuild', function(callback) {
+  runSequence('data', 'sass', 'template:comp', 'links:inject', 'css:inline','css:inject', 'html:tidy', 'html:min', callback);
+});
+
+
+// TEMPLATE CHAIN
+// --------------------------------------------------
+gulp.task('template', function(callback) {
+  runSequence('template:comp', 'links:inject', 'css:inline','css:inject', 'html:tidy', 'html:min', 'watch', callback);
+});
+
+
+//  CLEAR CHAIN
+// --------------------------------------------------
+// gulp.task('data', ['img:data','img:host','copy:encode','data:comp']);
+gulp.task('clear', function(callback) {
+  runSequence('folders:clean','data_src:clean', callback);
+});
+
+
+// DATA CHAIN BASIC
+// --------------------------------------------------
+// gulp.task('data', ['img:data','img:host','copy:encode','data:comp']);
+gulp.task('data', function(callback) {
+  runSequence('data:comp', callback);
+});
 
