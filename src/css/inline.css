@@ -235,10 +235,12 @@ td.container__td
 
 /*
 |--------------------------------------------------------------------------
-|  BG HERO MOD 
+|  BG HERO 
 |-------------------------------------------------------------------------- 
 */
-/** pink  | overide container__td */
+/** pink  | overides container__td */
+/** adjust bg position and bg size to taste  */
+/**  background-imageFor GANGA GMAIL */
 #bg-hero
 {
     margin: 0;
@@ -246,10 +248,10 @@ td.container__td
 
     text-align: center;
 
-    background-image: url('https://firebasestorage.googleapis.com/v0/b/ngdataformdemo.appspot.com/o/email%2Fhomeandaway%2Fhero_lo.jpg?alt=media&token=e30e7139-337a-4d6d-a0d6-f7c58795c386');  /** For GANGA GMAIL */
+    background-image: url('https://firebasestorage.googleapis.com/v0/b/ngdataformdemo.appspot.com/o/email%2Fhomeandaway%2Fhero_lo.jpg?alt=media&token=e30e7139-337a-4d6d-a0d6-f7c58795c386'); 
     background-repeat: no-repeat;
-    background-position: center center;   /** adjust position to taste */
-    background-size: cover;   /** adjust to taste  */
+    background-position: center bottom; 
+    background-size: cover;  
 }   
 /** Fixed bg width container for Outlook 2007+  - will overide with CSS to full width  */
 #bg-hero__text-container

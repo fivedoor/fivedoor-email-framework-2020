@@ -16,10 +16,10 @@
   */  
   #bg-hero {
     background-image: url("https://s3.amazonaws.com/ha-design/campaign/2018/us/traveler/adhoc/welcome/US/hero11.jpg") !important;
-    background-position: bottom !important; /** overides background center center - why? */
-    background-size: 100% auto !important;  /** overides background cover - why? */
+    background-position: center bottom !important; /** overides background center center - why? */
+    background-size: cover !important;  /** overides background cover - why? */
     /** height: 160px !important;  */
-    background-color: #11496a !important;   
+    background-color: #eeeeee !important;   
   }
    /** Overide fixed bg width container (for Outlook 2007+) to be full width of conditional mso/ie ghost container  */
   #bg-hero__text-container
@@ -37,7 +37,7 @@
   } */
   /** Overide 90% width -OL doesn't like  */
    .ie-target #bg-hero .content {
-    width: 637px !important;
+    width: 636px !important;
   }
 
  /*
