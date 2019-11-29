@@ -62,6 +62,9 @@ var notify = require('gulp-notify');
 // Error Prevention for multiple plugins
 var plumber = require('gulp-plumber');
 
+// Get Rid of Comments
+// const removeCode = require('gulp-remove-code');
+var stripCode = require('gulp-strip-code');
 
 /*
 |--------------------------------------------------------------------------
@@ -352,6 +355,27 @@ gulp.task('css:inject', function() {
     // .pipe(bs.stream());
 });
 
+//  STRIP COMMENTS  - CSS Dev Comments
+// ------------------------------------------------
+
+const cssComments = /\/\*.+?\*\//g; // single line 
+const cssAllComments = /\/\*([\s\S]*?)\*\//g; // single and multi line 
+const cssDevComments = /\/\*\*.+?\*\//g; // single line dev comments starting /** 
+const htmlComments = /<!--(?!<!)[^\[>].*?-->/g; // html comments not including conditional code 
+const htmlDevComments = /<!---(?!<!)[^\[>].*?-->/g; // html dev comments starting <!--- not including conditional code 
+const htmlAllComments = /<!--([\s\S]*?)-->/g; // html single and multi line 
+const htmlAllDevComments = /<!---([\s\S]*?)-->/g; // html dev single and multi line 
+
+
+
+gulp.task('css:comments-strip', function () {
+      return gulp
+        .src(['src/compiled/index.html'])
+        .pipe(replace(cssAllComments, ''))
+        .pipe(replace(htmlAllDevComments, ''))
+       .pipe(gulp.dest('src/compiled/'));
+  });
+  
 
 
 // TIDY HTML
@@ -408,7 +432,8 @@ gulp.task('compile', function (callback) {
     'css:save-copy', 
     'css:inline-ignore',
     'css:inline',
-    'css:inject', 
+    'css:inject',
+    'css:comments-strip' 
     'watch',
     callback
 //  ^^^^^^^^

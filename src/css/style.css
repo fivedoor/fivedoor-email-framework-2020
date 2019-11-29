@@ -31,10 +31,7 @@
       background-image: none !important;
       background: url("https://firebasestorage.googleapis.com/v0/b/ngdataformdemo.appspot.com/o/email%2Fhomeandaway%2Fhero_lo.jpg?alt=media&token=e30e7139-337a-4d6d-a0d6-f7c58795c386") !important;   
   }
-  /**  OL2003 try for full width  */
-  /* .ie-target #bg-hero__text-container {
-      width: 100% !important;
-  } */
+
   /** Overide 90% width -OL doesn't like  */
    .ie-target #bg-hero .content {
     width: 636px !important;

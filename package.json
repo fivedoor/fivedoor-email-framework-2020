@@ -34,6 +34,8 @@
     "gulp-remove-code": "^3.0.4",
     "gulp-replace": "^1.0.0",
     "gulp-string-replace": "^1.1.2",
+    "gulp-strip-code": "^0.1.4",
+    "gulp-strip-comments": "^2.5.2",
     "gulp4-run-sequence": "^1.0.0"
   }
 }
